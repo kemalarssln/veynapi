@@ -34,10 +34,11 @@ class SoruIstek(BaseModel):
 async def soru_uret(istek: SoruIstek):
     logger.info(f"Soru üretim isteği: {istek}")
     prompt = (
-        f"{istek.ulke} {istek.sinif} {istek.ders} dersi, {istek.konu} konusu için "
-        f"{istek.tip} bir soru üret. Soru, 4 şık ve doğru cevabı ile birlikte, ayrıca konu başlığını da JSON formatında döndür. "
-        "Her seferinde farklı ve özgün bir soru üret, önceki sorulardan farklı olsun. "
-        "Cevap formatı: {\"soru\": \"...\", \"secenekler\": [\"A\", \"B\", \"C\", \"D\"], \"dogru_cevap\": \"A\", \"konu\": \"...\"}"
+        f"Sen bir eğitim uzmanısın. {istek.ulke} ülkesinde yaşayan, yaşı {istek.sinif.replace('sınıf', '').strip()} olan bir çocuk için, "
+        f"her seferinde rastgele bir ders (ör. matematik, fen, sosyal, Türkçe, İngilizce, hayat bilgisi, vs.) ve o derse ait rastgele bir konu seç. "
+        f"Seçtiğin ders ve konuya uygun, yaşına göre anlaşılır, kısa ama net, özgün ve daha önce sormadığın bir {istek.tip} soru üret. "
+        f"Soru 4 şık ve doğru cevabı ile birlikte, konu başlığını da içersin. Cevap formatı: {{\"soru\": \"...\", \"secenekler\": [\"A\", \"B\", \"C\", \"D\"], \"dogru_cevap\": \"A\", \"konu\": \"...\", \"ders\": \"...\"}}. "
+        "Gereksiz açıklama, boşluk veya tekrar ekleme. Sadece JSON çıktısı ver."
     )
     try:
         response = openai_client.chat.completions.create(
