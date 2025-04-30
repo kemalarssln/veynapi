@@ -1,10 +1,11 @@
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from loguru import logger
 from dotenv import load_dotenv
 import openai
+from typing import Dict, List
 
 load_dotenv()
 # openai.api_key = os.getenv("OPENAI_API_KEY")  # eski satır
@@ -32,6 +33,27 @@ class SoruIstek(BaseModel):
 
 # Sınıfa göre ders ve konu listesi kaldırıldı
 
+# Türkiye için örnek sınıf-ders-konular veri yapısı
+TURKIYE_SINIF_DERS_KONU: Dict[str, Dict[str, List[str]]] = {
+    "1. sınıf": {
+        "Matematik": ["Toplama İşlemi", "Çıkarma İşlemi", "Sayılar"],
+        "Türkçe": ["Okuma Anlama", "Harfler", "Kısa Hikaye"]
+    },
+    "2. sınıf": {
+        "Matematik": ["Çarpma İşlemi", "Bölme İşlemi", "Geometri"],
+        "Türkçe": ["Dil Bilgisi", "Paragraf", "Yazım Kuralları"]
+    },
+    "6. sınıf": {
+        "Matematik": ["Kesirler", "Cebirsel İfadeler", "Geometri"],
+        "Fen Bilimleri": ["Vücudumuzdaki Sistemler", "Kuvvet ve Hareket"]
+    },
+    "7. sınıf": {
+        "Matematik": ["Oran Orantı", "Denklemler"],
+        "Fen Bilimleri": ["Hücre ve Genetik Kod", "Işık ve Ses"]
+    },
+    # ... diğer sınıflar eklenebilir ...
+}
+
 @app.post("/soru-uret")
 async def soru_uret(istek: SoruIstek):
     logger.info(f"Soru üretim isteği: {istek}")
@@ -58,4 +80,14 @@ async def soru_uret(istek: SoruIstek):
         return {"soru_json": cevap}
     except Exception as e:
         logger.error(f"Hata oluştu: {e}")
-        raise HTTPException(status_code=500, detail="Soru üretilemedi. Lütfen tekrar deneyin.") 
+        raise HTTPException(status_code=500, detail="Soru üretilemedi. Lütfen tekrar deneyin.")
+
+@app.get("/kullanici-ders-konulari")
+async def kullanici_ders_konulari(
+    ulke: str = Query(...),
+    sinif: str = Query(...)
+):
+    if ulke != "Türkiye":
+        return {"dersler": {}, "uyari": "Şu an sadece Türkiye destekleniyor."}
+    dersler = TURKIYE_SINIF_DERS_KONU.get(sinif, {})
+    return {"dersler": dersler} 
