@@ -7,7 +7,10 @@ from dotenv import load_dotenv
 import openai
 
 load_dotenv()
-openai.api_key = os.getenv("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")
+# openai.api_key = os.getenv("OPENAI_API_KEY")  # eski satır
+
+# Yeni OpenAI client'ı oluştur
+openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI()
 
@@ -36,7 +39,7 @@ async def soru_uret(istek: SoruIstek):
         "Cevap formatı: {\"soru\": \"...\", \"secenekler\": [\"A\", \"B\", \"C\", \"D\"], \"dogru_cevap\": \"A\", \"konu\": \"...\"}"
     )
     try:
-        response = openai.ChatCompletion.create(
+        response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=400,
