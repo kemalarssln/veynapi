@@ -35,9 +35,6 @@ class SoruIstek(BaseModel):
 @app.post("/soru-uret")
 async def soru_uret(istek: SoruIstek):
     logger.info(f"Soru üretim isteği: {istek}")
-    sinif_no = ''.join(filter(str.isdigit, istek.sinif))
-    dersler_konular = sinif_ders_konular.get(sinif_no, {})
-    dersler_str = '; '.join([f"{ders}: {', '.join(konular)}" for ders, konular in dersler_konular.items()])
     prompt = (
         f"Sen bir eğitim uzmanısın. {istek.ulke} ülkesinde yaşayan, {istek.sinif} öğrencisi bir çocuk için, "
         f"yalnızca {istek.sinif} seviyesine uygun derslerden ve o derslerin gerçek, güncel müfredat konularından rastgele birini seç. "
