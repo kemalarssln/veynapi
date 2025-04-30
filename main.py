@@ -36,6 +36,7 @@ async def soru_uret(istek: SoruIstek):
     prompt = (
         f"{istek.ulke} {istek.sinif} {istek.ders} dersi, {istek.konu} konusu için "
         f"{istek.tip} bir soru üret. Soru, 4 şık ve doğru cevabı ile birlikte, ayrıca konu başlığını da JSON formatında döndür. "
+        "Her seferinde farklı ve özgün bir soru üret, önceki sorulardan farklı olsun. "
         "Cevap formatı: {\"soru\": \"...\", \"secenekler\": [\"A\", \"B\", \"C\", \"D\"], \"dogru_cevap\": \"A\", \"konu\": \"...\"}"
     )
     try:
@@ -43,7 +44,7 @@ async def soru_uret(istek: SoruIstek):
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=400,
-            temperature=0.7,
+            temperature=1.0,
         )
         logger.info("OpenAI'dan yanıt alındı.")
         cevap = response.choices[0].message.content
